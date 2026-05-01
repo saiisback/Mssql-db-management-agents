@@ -12,12 +12,16 @@ from tools.mcp_client import get_langchain_tools
 
 
 def make_llm(temperature: float = 0.0) -> ChatOllama:
-    return ChatOllama(
-        model=CFG.ollama_model,
-        base_url=CFG.ollama_host,
-        temperature=temperature,
-        client_kwargs={"headers": {"Authorization": f"Bearer {CFG.ollama_api_key}"}},
-    )
+    kwargs: dict = {
+        "model": CFG.ollama_model,
+        "base_url": CFG.ollama_host,
+        "temperature": temperature,
+    }
+    if CFG.ollama_api_key:
+        kwargs["client_kwargs"] = {
+            "headers": {"Authorization": f"Bearer {CFG.ollama_api_key}"}
+        }
+    return ChatOllama(**kwargs)
 
 
 async def make_react_agent_async(allowed_tools: list[str], system_prompt: str):

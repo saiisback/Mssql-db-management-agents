@@ -1,26 +1,45 @@
 # Access policy for the DBA-Access-Agent (token authentication gate).
 # First matching rule wins.
-# requester supports glob (*@yourorg.com).
+# requester supports glob (*@yourorg.com or just *).
 # environment is a list or string; matched case-insensitively.
+# action is currently always "refresh".
 
 policies:
-  - requester: "*@yourorg.com"
-    environment: [dev, uat]
+  # ── Test / personal-laptop default ────────────────────────────
+  # Approves any requester for any non-prod environment.
+  # Comment this rule out (or tighten the glob) before any real deployment.
+  - requester: "*"
+    environment: [dev, uat, test, staging]
     action: refresh
     decision: approved
-    reason: "Non-prod refresh — auto-approved for org members"
+    reason: "Pilot/test mode — auto-approved for non-prod"
 
-  - requester: "senior.dba@yourorg.com"
-    environment: [prod]
-    action: refresh
-    decision: approved
-    reason: "Senior DBA approval for prod refresh"
+  # ── Real org rules (uncomment & edit when going past the pilot) ──
+  # - requester: "*@yourorg.com"
+  #   environment: [dev, uat]
+  #   action: refresh
+  #   decision: approved
+  #   reason: "Non-prod refresh — auto-approved for org members"
+  #
+  # - requester: "senior.dba@yourorg.com"
+  #   environment: [prod]
+  #   action: refresh
+  #   decision: approved
+  #   reason: "Senior DBA approval for prod refresh"
+  #
+  # - requester: "*@yourorg.com"
+  #   environment: [prod]
+  #   action: refresh
+  #   decision: rejected
+  #   reason: "Prod refreshes require senior DBA approval"
+  #   override_approvers:
+  #     - senior.dba@yourorg.com
+  #     - dba.lead@yourorg.com
 
-  - requester: "*@yourorg.com"
-    environment: [prod]
+  # ── Catch-all ──────────────────────────────────────────────────
+  # Anything not matched above gets rejected.
+  - requester: "*"
+    environment: [prod, production]
     action: refresh
     decision: rejected
-    reason: "Prod refreshes require senior DBA approval"
-    override_approvers:
-      - senior.dba@yourorg.com
-      - dba.lead@yourorg.com
+    reason: "Prod refresh blocked in pilot/test config"

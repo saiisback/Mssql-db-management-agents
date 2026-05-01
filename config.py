@@ -57,7 +57,7 @@ class Config:
 def load() -> Config:
     return Config(
         ollama_host=os.getenv("OLLAMA_HOST", "https://ollama.com"),
-        ollama_api_key=_req("OLLAMA_API_KEY"),
+        ollama_api_key=os.getenv("OLLAMA_API_KEY") or "",
         ollama_model=os.getenv("OLLAMA_MODEL", "kimi-k2.6"),
         source=SqlConfig(
             server=os.getenv("MSSQL_SOURCE_SERVER", "localhost"),
