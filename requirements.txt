@@ -1,0 +1,15 @@
+langgraph>=0.2.50
+langgraph-checkpoint-sqlite>=2.0.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-ollama>=0.2.0
+langchain-mcp-adapters>=0.0.5
+mcp>=1.0.0
+pymssql>=2.3.0
+atlassian-python-api>=3.41.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pyyaml>=6.0.0
+rich>=13.0.0
+pytz>=2024.1

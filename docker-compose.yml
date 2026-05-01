@@ -1,0 +1,40 @@
+services:
+  sqlserver-source:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db-agents-source
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SOURCE_PASSWORD:-YourSourcePass123!}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - source-data:/var/opt/mssql
+      - ./backups:/var/opt/mssql/backups
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" -C -N
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+  sqlserver-dest:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db-agents-dest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_DEST_PASSWORD:-YourDestPass123!}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1434:1433"
+    volumes:
+      - dest-data:/var/opt/mssql
+      - ./backups:/var/opt/mssql/backups
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" -C -N
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  source-data:
+  dest-data:

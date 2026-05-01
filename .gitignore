@@ -1,0 +1,16 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+db_agents.db
+db_agents.db-journal
+db_agents.db-wal
+db_agents.db-shm
+backups/*.bak
+logs/
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,26 @@
+# Access policy for the DBA-Access-Agent (token authentication gate).
+# First matching rule wins.
+# requester supports glob (*@yourorg.com).
+# environment is a list or string; matched case-insensitively.
+
+policies:
+  - requester: "*@yourorg.com"
+    environment: [dev, uat]
+    action: refresh
+    decision: approved
+    reason: "Non-prod refresh — auto-approved for org members"
+
+  - requester: "senior.dba@yourorg.com"
+    environment: [prod]
+    action: refresh
+    decision: approved
+    reason: "Senior DBA approval for prod refresh"
+
+  - requester: "*@yourorg.com"
+    environment: [prod]
+    action: refresh
+    decision: rejected
+    reason: "Prod refreshes require senior DBA approval"
+    override_approvers:
+      - senior.dba@yourorg.com
+      - dba.lead@yourorg.com
