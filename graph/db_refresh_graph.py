@@ -1,8 +1,8 @@
-"""LangGraph wiring: 8 nodes, conditional edges, SqliteSaver checkpointer."""
+"""LangGraph wiring: 8 nodes, conditional edges, in-memory checkpointer."""
 from __future__ import annotations
 
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.checkpoint.memory import MemorySaver
 
 from config import CFG
 from state.db_state import DBRefreshState
@@ -128,6 +128,6 @@ def get_app():
     global _compiled
     if _compiled is not None:
         return _compiled
-    saver = SqliteSaver.from_conn_string(CFG.sqlite_path).__enter__()
+    saver = MemorySaver()
     _compiled = build_graph().compile(checkpointer=saver)
     return _compiled

@@ -1,27 +1,27 @@
-"""LLM factory: kimi-k2.6 via Ollama Cloud, with optional MCP tool binding."""
+"""LLM factory: OpenAI-compatible client (OpenRouter), with optional MCP tool binding."""
 from __future__ import annotations
 
 import asyncio
 from typing import Any
 
-from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 
 from config import CFG
 from tools.mcp_client import get_langchain_tools
 
 
-def make_llm(temperature: float = 0.0) -> ChatOllama:
-    kwargs: dict = {
-        "model": CFG.ollama_model,
-        "base_url": CFG.ollama_host,
-        "temperature": temperature,
-    }
-    if CFG.ollama_api_key:
-        kwargs["client_kwargs"] = {
-            "headers": {"Authorization": f"Bearer {CFG.ollama_api_key}"}
-        }
-    return ChatOllama(**kwargs)
+def make_llm(temperature: float = 0.0) -> ChatOpenAI:
+    return ChatOpenAI(
+        model=CFG.ollama_model,
+        base_url=CFG.ollama_host,
+        api_key=CFG.ollama_api_key,
+        temperature=temperature,
+        default_headers={
+            "HTTP-Referer": "https://github.com/saiisback/db-agents",
+            "X-Title": "db-agents",
+        },
+    )
 
 
 async def make_react_agent_async(allowed_tools: list[str], system_prompt: str):

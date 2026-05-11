@@ -1,5 +1,5 @@
 """Pre-flight check: verify .env values can actually connect to your SQL Server
-and Ollama Cloud before running a real refresh.
+and the configured LLM (OpenRouter / OpenAI-compatible) before running a real refresh.
 
 Usage:  python check_connection.py
 """
@@ -36,10 +36,10 @@ def check_sql(label: str, cfg) -> bool:
         return False
 
 
-def check_ollama() -> bool:
-    console.print(f"[cyan]Checking Ollama[/cyan] {CFG.ollama_host} model={CFG.ollama_model}...")
+def check_llm() -> bool:
+    console.print(f"[cyan]Checking LLM[/cyan] {CFG.ollama_host} model={CFG.ollama_model}...")
     try:
-        url = CFG.ollama_host.rstrip("/") + "/api/chat"
+        url = CFG.ollama_host.rstrip("/") + "/chat/completions"
         headers = {"Authorization": f"Bearer {CFG.ollama_api_key}"} if CFG.ollama_api_key else {}
         r = requests.post(url, json={
             "model": CFG.ollama_model,
@@ -47,7 +47,8 @@ def check_ollama() -> bool:
             "stream": False,
         }, headers=headers, timeout=30)
         r.raise_for_status()
-        text = (r.json().get("message") or {}).get("content", "")
+        choices = r.json().get("choices") or [{}]
+        text = (choices[0].get("message") or {}).get("content", "")
         console.print(f"  [green]OK[/green]  model said: {text!r}")
         return True
     except Exception as e:
@@ -79,7 +80,7 @@ def main() -> int:
     ok_src = check_sql("SOURCE", CFG.source)
     ok_dst = check_sql("DEST  ", CFG.dest)
     ok_bk = check_backup_path()
-    ok_ll = check_ollama()
+    ok_ll = check_llm()
     console.print()
     console.print(f"Jira  enabled: {CFG.jira_enabled}")
     console.print(f"Teams enabled: {CFG.teams_enabled}")
